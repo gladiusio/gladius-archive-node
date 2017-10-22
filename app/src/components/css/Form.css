@@ -1,4 +1,14 @@
 .Form-Header {
-    color: green;
-    text-align: center;
+    color: grey;
+}
+
+.Top-Row {
+    padding-top: 20px;
+    background-color: white;
+    border-radius: 6px;
+}
+
+.Form-Button{
+    color: grey;
+
 }

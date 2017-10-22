@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import Form from './components/Form'
+import {Grid, Row, Col} from 'react-bootstrap';
+import Form from './components/Form';
 import logo from './logo.png';
 import './App.css';
 
@@ -20,13 +21,18 @@ class App extends Component {
 
     render() {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo"/>
-                    <h1 className="App-title">Gladius node interface</h1>
-                </header>
-                {this.checkInjectedWeb3()}
-            </div>
+            <Grid className="App">
+                <Row className="show-grid">
+                    <Col xs={6} xsOffset={3} className="Top-Row">
+                        <header className="App-header">
+                            <img src={logo} className="App-logo" alt="logo"/>
+                            <h1 className="App-title">Gladius node interface</h1>
+                        </header>
+                        <br/>
+                        {this.checkInjectedWeb3()}
+                    </Col>
+                </Row>
+            </Grid>
         );
     }
 }

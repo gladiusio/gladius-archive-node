@@ -1,3 +1,8 @@
+body {
+    padding-top: 90px;
+    background: linear-gradient(-45deg,#17244e,#17244e 60%,#47175c) fixed;
+}
+
 .App {
     text-align: center;
 }
@@ -7,10 +12,9 @@
 }
 
 .App-header {
-    background: linear-gradient(-45deg, #17244e, #17244e 60%, #47175c);
     height: 180px;
     padding: 10px;
-    color: white;
+    color: black;
 }
 
 .App-title {

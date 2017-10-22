@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import JoinPool from "./JoinPool";
 
 var Pool = require('../contracts/Pool.json');
+var Keys = require('../keypair.json');
 
 
 class Form extends Component {
@@ -27,7 +28,7 @@ class Form extends Component {
     render() {
         return (
             <div>
-                <JoinPool myWeb3={this.state.myWeb3} poolObject={this.state.poolObject}/>
+                <JoinPool myWeb3={this.state.myWeb3} poolObject={this.state.poolObject} keys={Keys}/>
             </div>
         );
     }

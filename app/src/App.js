@@ -14,7 +14,7 @@ class App extends Component {
         }
         else {
             return (
-                <p>"Please use a browser that supports web3 or install an extension like Metamask."</p>
+                <p>Please use a browser that supports web3 or install an extension like Metamask.</p>
             )
         }
     }

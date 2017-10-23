@@ -3,6 +3,8 @@ import {FormControl, Button, FormGroup, Form, ControlLabel, HelpBlock} from 'rea
 import NodeRSA from 'node-rsa';
 import './css/Form.css';
 
+let http = require('http');
+
 class JoinPool extends Component {
     constructor(props) {
         super(props);
@@ -12,12 +14,19 @@ class JoinPool extends Component {
         this.handleButtonClick = this.handleButtonClick.bind(this);
         this.encryptData = this.encryptData.bind(this);
 
-        // Set initial value and inherit web3
-        this.state = {value: '', myWeb3: props.myWeb3, poolObject: props.poolObject, help: 'Not a valid address'};
+        // Set initial values and inherit web3
+        this.state = {
+            poolAddress: '',
+            ipAddress: '',
+            emailAddress: '',
+            myWeb3: props.myWeb3,
+            poolObject: props.poolObject,
+            help: 'Not a valid address'
+        };
     }
 
     getValidationState() {
-        if (this.state.myWeb3.utils.isAddress(this.state.value))
+        if (this.state.myWeb3.utils.isAddress(this.state.poolAddress))
             return {status: 'success', message: 'Valid address'};
         else
             return {status: 'error', message: 'Not a valid address'};
@@ -26,7 +35,7 @@ class JoinPool extends Component {
 
 
     handleChange(e) {
-        this.setState({value: e.target.value});
+        this.setState({[e.target.name]: e.target.value});
     }
 
     encryptData(data, publicKey) {
@@ -37,15 +46,16 @@ class JoinPool extends Component {
 
     handleButtonClick(e) {
         if (this.getValidationState().status === 'success') {
-            this.state.poolObject.options.address = this.state.value;
+            this.state.poolObject.options.address = this.state.poolAddress;
 
             let self = this;
             // Get the accounts
             this.state.myWeb3.eth.getAccounts(function (err, accounts) {
                 // Get the public key
                 self.state.poolObject.methods.getPoolPublicKey().call().then(function (result) {
-                    // Propose the node
-                    self.state.poolObject.methods.proposeNode(accounts[0], self.props.keys.publicKey, self.encryptData("testing", result))
+                    // Propose the node and it's information
+                    self.state.poolObject.methods.proposeNode(accounts[0], self.props.keys.publicKey,
+                        self.encryptData(self.state.ipAddress + "|" + self.state.emailAddress, result))
                         .send({from: accounts[0]}).then(
                         function (send_result) {
                             console.log(send_result);
@@ -63,12 +73,29 @@ class JoinPool extends Component {
                     controlId="formBasicText"
                     validationState={this.getValidationState().status}
                 >
-                    <ControlLabel>Pool address</ControlLabel>
+                    <ControlLabel>Information</ControlLabel>
                     {' '}
                     <FormControl
                         type="text"
-                        value={this.state.value}
-                        placeholder="Enter text"
+                        name="poolAddress"
+                        value={this.state.poolAddress}
+                        placeholder="Enter pool"
+                        onChange={this.handleChange}
+                    />
+                    {' '}
+                    <FormControl
+                        type="text"
+                        name="ipAddress"
+                        value={this.state.ipAddress}
+                        placeholder="Enter your public IP"
+                        onChange={this.handleChange}
+                    />
+                    {' '}
+                    <FormControl
+                        type="text"
+                        name="emailAddress"
+                        value={this.state.emailAddress}
+                        placeholder="Enter email"
                         onChange={this.handleChange}
                     />
                     {' '}

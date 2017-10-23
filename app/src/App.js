@@ -23,7 +23,7 @@ class App extends Component {
         return (
             <Grid className="App">
                 <Row className="show-grid">
-                    <Col xs={6} xsOffset={3} className="Top-Row">
+                    <Col xs={12} className="Top-Row">
                         <header className="App-header">
                             <img src={logo} className="App-logo" alt="logo"/>
                             <h1 className="App-title">Gladius node interface</h1>

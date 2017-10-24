@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './css/Form.css';
 import Web3 from 'web3';
 import JoinPool from "./JoinPool";
+import GetIP from "./GetIP";
 
 var Pool = require('../contracts/Pool.json');
 var Keys = require('../keypair.json');
@@ -29,6 +30,7 @@ class Form extends Component {
         return (
             <div>
                 <JoinPool myWeb3={this.state.myWeb3} poolObject={this.state.poolObject} keys={Keys}/>
+                <GetIP myWeb3={this.state.myWeb3} poolObject={this.state.poolObject} keys={Keys}/>
             </div>
         );
     }

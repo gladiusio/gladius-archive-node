@@ -3,7 +3,6 @@ import {FormControl, Button, FormGroup, Form, ControlLabel, HelpBlock} from 'rea
 import NodeRSA from 'node-rsa';
 import './css/Form.css';
 
-let http = require('http');
 
 class JoinPool extends Component {
     constructor(props) {
@@ -13,6 +12,8 @@ class JoinPool extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleButtonClick = this.handleButtonClick.bind(this);
         this.encryptData = this.encryptData.bind(this);
+        this.validateEmail = this.validateEmail.bind(this);
+        this.validateIP = this.validateIP.bind(this);
 
         // Set initial values and inherit web3
         this.state = {
@@ -20,17 +21,47 @@ class JoinPool extends Component {
             ipAddress: '',
             emailAddress: '',
             myWeb3: props.myWeb3,
-            poolObject: props.poolObject,
-            help: 'Not a valid address'
+            poolObject: props.poolObject
         };
     }
 
-    getValidationState() {
-        if (this.state.myWeb3.utils.isAddress(this.state.poolAddress))
-            return {status: 'success', message: 'Valid address'};
-        else
-            return {status: 'error', message: 'Not a valid address'};
+    validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    }
 
+    validateIP(ip) {
+        var re = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
+        return re.test(ip)
+    }
+
+    getValidationState() {
+        let messages = [];
+        let status = 'success';
+
+        if (this.state.myWeb3.utils.isAddress(this.state.poolAddress)) {
+            messages[0] = 'Valid eth address';
+        } else {
+            status = 'error';
+            messages[0] = 'Invalid eth address';
+        }
+
+        if (this.validateEmail(this.state.emailAddress)) {
+            messages[1] = 'Valid email address';
+        } else {
+            status = 'error';
+            messages[1] = 'Invalid email address';
+        }
+
+        if (this.validateIP(this.state.ipAddress)) {
+            messages[2] = 'Valid IP address';
+        } else {
+            status = 'error';
+            messages[2] = 'Invalid IP address';
+        }
+
+
+        return {status: status, message: messages.join(', ')}
     }
 
 
@@ -51,18 +82,26 @@ class JoinPool extends Component {
             let self = this;
             // Get the accounts
             this.state.myWeb3.eth.getAccounts(function (err, accounts) {
-                // Get the public key
-                self.state.poolObject.methods.getPoolPublicKey().call().then(function (result) {
-                    // Propose the node and it's information
-                    self.state.poolObject.methods.proposeNode(accounts[0], self.props.keys.publicKey,
-                        self.encryptData(self.state.ipAddress + "|" + self.state.emailAddress, result))
-                        .send({from: accounts[0]}).then(
-                        function (send_result) {
-                            console.log(send_result);
-                        }
-                    )
-                });
-            });
+                if (accounts[0] !== undefined) {
+                        // Get the public key
+                        self.state.poolObject.methods.getPoolPublicKey().call().then(function (result) {
+                            // Encrypt the string
+                            let encryptedData = self.encryptData(self.state.ipAddress + "|" + self.state.emailAddress, result);
+                            console.log("Encrypted string: " + encryptedData);
+                            // Propose the node and it's information
+                            self.state.poolObject.methods.proposeNode(accounts[0], self.props.keys.publicKey, encryptedData)
+                                .send({from: accounts[0]}).then(
+                                function (send_result) {
+                                    console.log(send_result);
+                                }
+                            )
+                        });
+                    }
+                    else{
+                        alert("Looks like you need to unlock your wallet.")
+                    }
+                }
+            );
         }
     }
 
@@ -99,7 +138,7 @@ class JoinPool extends Component {
                         onChange={this.handleChange}
                     />
                     {' '}
-                    <Button class="Form-Button" onClick={this.handleButtonClick}>Request to join pool</Button>
+                    <Button className="Form-Button" onClick={this.handleButtonClick}>Request to join pool</Button>
                     <HelpBlock>{this.getValidationState().message}</HelpBlock>
                 </FormGroup>
             </Form>
